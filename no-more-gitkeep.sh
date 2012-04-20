@@ -22,4 +22,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+if [ $# -eq "0" ]; then
+    DIR=$(pwd)
+else
+    DIR=$1
+fi
 
+cd "$DIR"
+
+# find the directories that contain a .gitkeep file
+for line in $(git ls-files | grep '/.gitkeep$'); do
+    # list the files that git knows about in the directory containing a .gitkeep;
+    # skip the actual .gitkeep file;
+    # count the number of lines remaining
+    EXTRA_FILES=$(git ls-files $(dirname "$line") | wc -l)
+    if [ $EXTRA_FILES -ne "1" ]; then
+        # git is tracking a file in the directory other than .gitkeep
+        rm "$line"
+    fi
+done
